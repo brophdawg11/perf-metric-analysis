@@ -2,7 +2,12 @@
 
 HTML pages used for perf metric analysis, to help visualize and understand the differences between various perf timings (i.e., `domInteractive`, `domContentLoaded`, `onload`, `LCP`, `TTI`, and so on).
 
-Available at: https://brophdawg11.github.io/perf-metric-analysis/
+
+## Usage
+
+Can access the latest page at: https://brophdawg11.github.io/perf-metric-analysis/
+
+For local development, run `npx http-server docs/`
 
 
 ## Notes

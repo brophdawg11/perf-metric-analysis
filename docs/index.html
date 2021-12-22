@@ -5,27 +5,70 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/favicon.ico">
+    <script>
+        function start(l) {
+            performance.mark(`${l}-start`);
+        }
+
+        function end(l) {
+            console.log('ending custom timer:', l)
+            performance.mark(`${l}-end`)
+            performance.measure(l, `${l}-start`, `${l}-end`);
+        }
+
+        start('domInteractive');
+        start('DOMContentLoaded');
+        start('domComplete');
+        start('load-event-start');
+        start('load-event-done');
+
+        let log = '';
+        console.log('initial document.readyState', document.readyState);
+        document.addEventListener('readystatechange', (e) => {
+            if (document.readyState === 'interactive') {
+                end('domInteractive');
+            } else if (document.readyState === 'complete') {
+                end('domComplete');
+            } else {
+                console.log('Unhandled readystatechange event:', document.readyState, e);
+            }
+        });
+        window.addEventListener('load', () => {
+            end('load-event-start');
+            setTimeout(() => end('load-event-done'), 0);
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            end('DOMContentLoaded');
+        });
+    </script>
+
     <style>
+        body {
+            --slow-css-loaded:0px;
+        }
+
         * {
             margin: 0;
             padding: 0;
+        }
+
+        h1 {
+            border: var(--slow-css-loaded) solid black;
         }
 
         img {
             background-color: rgba(200, 200, 200, 0.5);
         }
     </style>
+    <link rel="stylesheet" href="https://slowfil.es/file?type=css&delay=500" />
 </head>
 <body> 
     <h1>Page Heading</h1>
-    <img src="http://www.fillmurray.com/2000/1000" width="1000" height="500" /><br>
-    <img src="http://www.fillmurray.com/200/200" width="200" height="200"/>
-    <img src="http://www.fillmurray.com/200/300" width="200" height="300"/>
-    <img src="http://www.fillmurray.com/300/200" width="300" height="200" />
-    <img src="http://www.fillmurray.com/300/300" width="300" height="300"/>
-    <script src="https://slowfil.es/file?type=js&delay=500" defer></script>
-    <script src="https://slowfil.es/file?type=js&delay=1000" defer></script>
-    <script src="https://slowfil.es/file?type=js&delay=5000" defer></script>
+    <img src="2000x1000.jpg" width="1000" height="500" /><br>
+    <img src="200x200.jpg" width="200" height="200"/>
+    <img src="200x300.jpg" width="200" height="300"/>
+    <img src="300x200.jpg" width="300" height="200" />
+    <img src="300x300.jpg" width="300" height="300"/>
     <div>
         <p>This is some text This is some text This is some text This is some text</p>
         <p>This is some text This is some text This is some text This is some text</p>
@@ -244,5 +287,47 @@
         <p>This is some text This is some text This is some text This is some text</p>
         <p>This is some text This is some text This is some text This is some text</p>
     </div>
+    <!-- Blocking scripts -->
+    <script src="https://slowfil.es/file?type=js&delay=500"></script>
+    <script src="https://slowfil.es/file?type=js&delay=750" defer></script>
+    <script src="https://slowfil.es/file?type=js&delay=1000" async></script>
+    <script src="long-task.js" defer></script>
+    <script src="long-task-on-load.js" defer></script>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('timings:');
+                const entries = window.performance.getEntries().map(e => e.toJSON());
+                const timingEntries = [];
+
+                // Built-in timings
+                const navigationEntry = entries.find(e => e.entryType === 'navigation');
+                const includeTiming = e => (
+                    (e[0].startsWith('dom') && !e[0].startsWith('domain')) ||
+                    e[0].startsWith('load') ||
+                    e[0].startsWith('responseEnd') ||
+                    e[0] === 'duration'
+                );
+                Object.entries(navigationEntry)
+                    .filter(includeTiming)
+                    .forEach(e => timingEntries.push([e[0], Math.round(e[1])]));
+
+                // Paint timings
+                entries.filter(e => e.entryType === 'paint')
+                    .forEach(e => timingEntries.push([e.name, Math.round(e.startTime)]));
+
+                const values = timingEntries.sort((a, b) => a[1] - b[1])
+                    .reduce((acc, [k, v]) => Object.assign(acc, { [k]: v }), {});
+
+                console.log(JSON.stringify(values, null, 4))
+            }, 1000);
+        })
+    </script>
+
+    <!-- Async (order-independent) scripts
+    <script src="long-task.js" async></script>
+    <script src="long-task-on-load.js" async></script>
+    -->
 </body>
 </html>

@@ -1,5 +1,5 @@
-function longTaskOnLoad() {
-    console.log('Start long task (onload)');
+function longTaskThenWaterfall() {
+    console.log('Start long task (waterfall)');
     let start = performance.now();
     let i = 0;
     let value = 0;
@@ -10,23 +10,20 @@ function longTaskOnLoad() {
         value /= Math.random();
     }
     let time = Math.round(performance.now() - start);
-    console.log(`Done executing long task (onload) in ${time}ms`, value);
+    console.log(`Done executing long task (waterfall) in ${time}ms`, value);
 }
 
+longTaskThenWaterfall();
 
-window.addEventListener('load', longTaskOnLoad, { once: true });
+const el = document.createElement('script');
+el.src = 'long-task.js?v=synchronous-waterfall';
+document.querySelector('head').appendChild(el);
 
-window.addEventListener('load', () => {
+setTimeout(() => {
     const el = document.createElement('script');
-    el.src = 'long-task.js?v=synchronous-onload';
+    el.src = 'long-task.js?v=asynchronous-waterfall';
     document.querySelector('head').appendChild(el);
-
-    setTimeout(() => {
-        const el = document.createElement('script');
-        el.src = 'long-task.js?v=asynchronous-onload';
-        document.querySelector('head').appendChild(el);
-    }, 500)
-}, { once: true });
+}, 500);
 
 function unusedFunctionThatMakesTheDocumentBig() {
     console.log('01234567890123456789012345678901234567890123456789');

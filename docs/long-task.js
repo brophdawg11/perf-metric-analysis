@@ -10,7 +10,7 @@ function longTask() {
         value /= Math.random();
     }
     let time = Math.round(performance.now() - start);
-    console.log(`Done executing JS file in ${time}ms`, value);
+    console.log(`Done executing long task in ${time}ms`, value);
 }
 
 

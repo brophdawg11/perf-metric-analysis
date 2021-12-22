@@ -12,11 +12,12 @@ Available at: https://brophdawg11.github.io/perf-metric-analysis/
 * `domInteractive`
   * `First Paint` + blocking scripts downloaded
 * `DOMContentLoaded`
-  * `domInteractive` + `defer` scripts downloaded  + executed
+  * `domInteractive` + `defer` scripts downloaded/executed
+  * Does not include any synchronous or asynchronous waterfall scripts from `defer`
   * _Does not_ include images completing
-  * _Does not_ include `async` scripts
 * `domComplete`
-  * `DOMContentLoaded` + images + `async` scripts + script execution
+  * `DOMContentLoaded` + images + `async` scripts downloaded/executed
+  * Does include any synchronous or asynchronous waterfall scripts from `async`
   * Effectively when the load event fires
 * `load`
   * `domComplete` + synchronous code that runs as part of the load event

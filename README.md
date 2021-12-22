@@ -11,7 +11,7 @@ Available at: https://brophdawg11.github.io/perf-metric-analysis/
   * Document parsed + blocking stylesheets downloaded
 * `domInteractive`
   * `First Paint` + blocking scripts downloaded
-* `domContentLoaded`
+* `DOMContentLoaded`
   * `domInteractive` + `defer` scripts downloaded  + executed
   * _Does not_ include images completing
   * _Does not_ include `async` scripts
